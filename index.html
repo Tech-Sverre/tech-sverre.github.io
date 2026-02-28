@@ -89,6 +89,17 @@
             border: 1px solid #1f2937;
             color: #b26bff;
         }
+
+        .counter {
+            margin-top: 40px;
+            background: #111827;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #1f2937;
+            color: #b26bff;
+            text-align: center;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +107,7 @@
 <header>
     <img src="hnSW4ZDpWY2qThfg8ZBJx.jpeg" alt="TechSverre Logo" class="logo">
     <h1>TechSverre</h1>
-    <p>Welcome to my website, here you can find my socials and my discord server!</p>
+    <p>Welcome to my website!</p>
 </header>
 
 <main>
@@ -118,10 +129,22 @@
 
     <div class="about">
         <h2>About Me</h2>
-        <p>Hello there, my name is Sverre! You may know me as techsverre online. This is my website, enjoy! Also, a little bit of extra introduction from me to you:) I am a tech enthusiast, i love motorsports (eg: Formula 1) and thats it!</p>
+        <p>Hello there, my name is Sverre! You may know me as techsverre online. This is my website — enjoy!</p>
+    </div>
+
+    <div class="counter">
+        <h2>Visitor Counter</h2>
+        <p>You are visitor number: <span id="visitor-count">Loading...</span></p>
     </div>
 </main>
 
+<script>
+    fetch('https://api.countapi.xyz/hit/techsverre-site/visits')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('visitor-count').innerText = data.value;
+        });
+</script>
+
 </body>
 </html>
-
