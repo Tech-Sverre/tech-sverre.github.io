@@ -1,207 +1,482 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Torrents - TechSverre</title>
-    <link rel="icon" type="image/png" href="favicon-32x32.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechSverre · Torrents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #0d0f14;
-            color: #3690F6;
-        }
 
-        header {
-            text-align: center;
-            padding: 60px 20px 40px;
-            background: linear-gradient(135deg, #111827, #0d0f14);
-            border-bottom: 1px solid #1f2937;
-        }
+:root {
+  --bg: #050a12;
+  --glass: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-hover: rgba(255,255,255,0.07);
+  --accent: #00c8ff;
+  --accent2: #7b5ea7;
+  --text: #e8f0ff;
+  --muted: rgba(232,240,255,0.45);
+  --glow: 0 0 24px rgba(0,200,255,0.18);
+}
 
-        .logo {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #3690F6;
-            margin-bottom: 20px;
-        }
+html, body {
+  min-height: 100%; background: var(--bg);
+  color: var(--text); font-family: 'Oxanium', sans-serif;
+  overflow-x: hidden;
+}
 
-        header h1 {
-            font-size: 2.5rem;
-            margin: 0;
-            color: #3690F6;
-        }
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 25%, rgba(0,200,255,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 65%, rgba(123,94,167,0.09) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 50% 5%,  rgba(0,100,200,0.06) 0%, transparent 70%);
+}
+.grid-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,200,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridShift 20s linear infinite;
+}
+@keyframes gridShift { to { background-position: 60px 60px; } }
+.scan {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+}
 
-        main {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-        }
+/* ── Hamburger ── */
+.hamburger-btn {
+  position: fixed; top: 20px; right: 24px; z-index: 200;
+  width: 44px; height: 44px;
+  background: rgba(0,200,255,0.08);
+  border: 1px solid rgba(0,200,255,0.22);
+  border-radius: 8px; cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 5px;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s, border-color 0.2s;
+}
+.hamburger-btn:hover { background: rgba(0,200,255,0.15); border-color: var(--accent); }
+.hamburger-btn span {
+  display: block; width: 20px; height: 2px;
+  background: var(--accent); border-radius: 2px;
+  transition: transform 0.35s cubic-bezier(.77,0,.18,1), opacity 0.2s;
+  transform-origin: center;
+}
+.hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        h2 {
-            color: #3690F6;
-        }
+/* ── Menu panel ── */
+.menu-panel {
+  position: fixed; top: 0; right: 0; z-index: 190;
+  width: 300px; height: 100%;
+  background: rgba(5,12,24,0.72);
+  backdrop-filter: blur(28px) saturate(1.4);
+  border-left: 1px solid rgba(0,200,255,0.12);
+  transform: translateX(100%);
+  transition: transform 0.42s cubic-bezier(.77,0,.18,1);
+  display: flex; flex-direction: column;
+  padding: 90px 32px 40px; gap: 8px;
+}
+.menu-panel.open { transform: translateX(0); }
+.menu-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.18em;
+  color: var(--accent); opacity: 0.6;
+  text-transform: uppercase; margin-bottom: 6px; margin-top: 20px;
+}
+.menu-label:first-child { margin-top: 0; }
+.menu-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-radius: 8px;
+  border: 1px solid transparent;
+  color: var(--text); text-decoration: none;
+  font-size: 15px; font-weight: 400; letter-spacing: 0.04em;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.menu-link:hover { background: rgba(0,200,255,0.07); border-color: rgba(0,200,255,0.18); color: var(--accent); }
+.menu-link .icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.8; }
+.menu-link .badge {
+  margin-left: auto;
+  font-family: 'Share Tech Mono', monospace; font-size: 9px; letter-spacing: 0.12em;
+  background: rgba(0,200,255,0.12); border: 1px solid rgba(0,200,255,0.25);
+  color: var(--accent); padding: 2px 7px; border-radius: 4px;
+}
+.menu-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 6px 0; }
+.menu-footer { margin-top: auto; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; }
 
-        .file-box {
-            background: #111827;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #1f2937;
-            margin-bottom: 20px;
-        }
+.overlay {
+  position: fixed; inset: 0; z-index: 185;
+  background: rgba(0,0,0,0.5);
+  opacity: 0; pointer-events: none; transition: opacity 0.35s;
+}
+.overlay.open { opacity: 1; pointer-events: auto; }
 
-        .download-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #3690F6;
-            color: #0d0f14;
-            font-weight: bold;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: 0.2s;
-        }
+/* ── Page ── */
+.page {
+  position: relative; z-index: 10;
+  max-width: 680px; margin: 0 auto;
+  padding: 60px 20px 100px;
+}
 
-        .download-btn:hover {
-            background: #5aa6ff;
-        }
+.page-header {
+  margin-bottom: 40px;
+  animation: fadeUp 0.7s ease both;
+}
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.14em;
+  color: var(--muted); text-decoration: none;
+  text-transform: uppercase; margin-bottom: 24px;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--accent); }
+.back-link svg { width: 14px; height: 14px; }
+.page-title {
+  font-size: 32px; font-weight: 700; letter-spacing: 0.06em;
+  background: linear-gradient(90deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.page-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px; color: var(--muted); margin-top: 6px;
+  letter-spacing: 0.14em;
+}
 
-        /* Hamburger button */
-        .hamburger {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            font-size: 32px;
-            cursor: pointer;
-            color: #3690F6;
-            z-index: 1000;
-        }
+/* ── Torrent cards ── */
+.torrent-list { display: flex; flex-direction: column; gap: 12px; }
 
-        /* Side menu */
-        .side-menu {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: #111827;
-            overflow-x: hidden;
-            transition: 0.4s;
-            padding-top: 60px;
-            border-left: 2px solid #3690F6;
-            z-index: 999;
-        }
+.torrent-card {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  backdrop-filter: blur(16px) saturate(1.3);
+  padding: 18px 20px;
+  transition: background 0.25s, border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+  animation: fadeUp 0.7s ease both;
+  position: relative; overflow: hidden;
+}
+.torrent-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(120deg, rgba(255,255,255,0.04) 0%, transparent 55%);
+  pointer-events: none;
+}
+.torrent-card:hover {
+  background: var(--glass-hover);
+  transform: translateY(-2px);
+  border-color: rgba(0,200,255,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), var(--glow);
+}
 
-        .side-menu a {
-            padding: 12px 24px;
-            text-decoration: none;
-            font-size: 22px;
-            color: #3690F6;
-            display: block;
-        }
+.torrent-card:nth-child(1) { animation-delay: 0.15s; }
+.torrent-card:nth-child(2) { animation-delay: 0.22s; }
+.torrent-card:nth-child(3) { animation-delay: 0.29s; }
+.torrent-card:nth-child(4) { animation-delay: 0.36s; }
+.torrent-card:nth-child(5) { animation-delay: 0.43s; }
+.torrent-card:nth-child(6) { animation-delay: 0.50s; }
 
-        .side-menu a:hover {
-            background-color: #1f2937;
-        }
-    </style>
+.category-icon {
+  width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cat-video { background: rgba(255,69,87,0.12); }
+.cat-game  { background: rgba(0,229,160,0.10); }
+.cat-soft  { background: rgba(0,200,255,0.10); }
+.cat-music { background: rgba(170,100,255,0.12); }
+
+.card-meta { flex: 1; min-width: 0; }
+.torrent-name {
+  font-size: 15px; font-weight: 600; letter-spacing: 0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 7px;
+}
+.torrent-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.12em;
+  padding: 2px 8px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted); text-transform: uppercase;
+}
+.tag.quality { border-color: rgba(0,200,255,0.25); color: var(--accent); }
+
+.btn-dl {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 7px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, rgba(0,200,255,0.18), rgba(123,94,167,0.18));
+  border: 1px solid rgba(0,200,255,0.3);
+  border-radius: 8px; cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.1em; color: var(--text);
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+.btn-dl:hover {
+  background: linear-gradient(135deg, rgba(0,200,255,0.32), rgba(123,94,167,0.32));
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(0,200,255,0.25);
+  transform: translateY(-1px);
+}
+.btn-dl svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+  z-index: 300;
+  background: rgba(5,14,26,0.92);
+  border: 1px solid rgba(0,200,255,0.3);
+  border-radius: 10px; padding: 12px 22px;
+  backdrop-filter: blur(20px);
+  font-family: 'Share Tech Mono', monospace; font-size: 12px;
+  color: var(--accent); letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+  opacity: 0; pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast svg { width: 15px; height: 15px; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.footer {
+  margin-top: 52px; text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: var(--muted); letter-spacing: 0.12em;
+  animation: fadeUp 0.9s 0.6s ease both;
+}
+.footer span { color: var(--accent); }
+
+@media (max-width: 500px) {
+  .torrent-card { flex-wrap: wrap; }
+  .btn-dl { width: 100%; justify-content: center; }
+}
+
+
+  </style>
 </head>
 <body>
 
-<div class="hamburger" onclick="toggleMenu()">☰</div>
+<div class="bg-layer"></div>
+<div class="grid-layer"></div>
+<div class="scan"></div>
 
-<div id="sideMenu" class="side-menu">
-    <a href="index">Main</a>
-    <a href="other-media">Other Media</a>
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+<button class="hamburger-btn" id="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+  <span></span><span></span><span></span>
+</button>
+
+<nav class="menu-panel" id="menuPanel">
+  <p class="menu-label">Navigate</p>
+  <a href="techsverre-socials.html" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Home
+  </a>
+  <a href="https://techsverre.run.place" target="_blank" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    Website
+  </a>
+  <div class="menu-divider"></div>
+  <p class="menu-label">Media</p>
+  <a href="techsverre-torrents.html" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+    Torrents
+    <span class="badge">P2P</span>
+  </a>
+  <a href="#" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>
+    Videos & Clips
+  </a>
+  <a href="#" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    Soundboard
+  </a>
+  <a href="#" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Discord Server
+    <span class="badge">LIVE</span>
+  </a>
+  <div class="menu-divider"></div>
+  <p class="menu-label">Info</p>
+  <a href="#" class="menu-link">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    About
+  </a>
+  <p class="menu-footer">TechSverre &nbsp;·&nbsp; <span style="color:var(--accent)">techsverre.run.place</span></p>
+</nav>
+
+<main class="page">
+
+  <div class="page-header">
+    <a href="techsverre-socials.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </a>
+    <h1 class="page-title">Torrents</h1>
+    <p class="page-subtitle">Shared by TechSverre &nbsp;·&nbsp; P2P Distribution</p>
+  </div>
+
+  <div class="torrent-list">
+
+
+<div class="torrent-card">
+  <div class="category-icon cat-video">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff4557" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+  </div>
+  <div class="card-meta">
+    <p class="torrent-name">placeholder</p>
+    <div class="torrent-tags">
+      <span class="tag quality">Placeholder</span>
+      <span class="tag quality">Placeholder</span>
+      <span class="tag">Placeholder</span>
+      <span class="tag">Placeholder</span>
+    </div>
+  </div>
+  <a href="#" class="btn-dl" onclick="startDownload(event,'Tech Talk Ep.12')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    DOWNLOAD
+  </a>
 </div>
 
-<header>
-    <img src="hnSW4ZDpWY2qThfg8ZBJx.png" class="logo">
-    <h1>Torrents</h1>
-</header>
-
-<main>
-    <h2>Torrent Downloads</h2>
-    <p>Game & Movie Torrents you can download! (Currently: 10)</p>
-
-    <div class="file-box">
-        <h3>F1 2021</h3>
-        <p>F1 2021 Game torrent.</p>
-        <a class="download-btn" href="files/F1-2021.torrent" download>Download</a>
+<div class="torrent-card">
+  <div class="category-icon cat-game">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00e5a0" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01M7 12h.01M17 12h.01M12 8v8"/></svg>
+  </div>
+  <div class="card-meta">
+    <p class="torrent-name">Placeholder</p>
+    <div class="torrent-tags">
+      <span class="tag quality">Placeholder</span>
+      <span class="tag">Placeholder</span>
+      <span class="tag">Placeholder</span>
     </div>
+  </div>
+  <a href="#" class="btn-dl" onclick="startDownload(event,'KSP1 Modpack')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    DOWNLOAD
+  </a>
+</div>
 
-    <div class="file-box">
-        <h3>Forza Horizon 5</h3>
-        <p>Forza Horizon 5 Game torrent.</p>
-        <a class="download-btn" href="files/FH5.torrent" download>Download</a>
+<div class="torrent-card">
+  <div class="category-icon cat-soft">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+  </div>
+  <div class="card-meta">
+    <p class="torrent-name">Placeholder</p>
+    <div class="torrent-tags">
+      <span class="tag quality">Placeholder</span>
+      <span class="tag">Placeholder</span>
+      <span class="tag">Placeholder</span>
     </div>
+  </div>
+  <a href="#" class="btn-dl" onclick="startDownload(event,'Hackintosh OpenCore EFI')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    DOWNLOAD
+  </a>
+</div>
 
-    <div class="file-box">
-        <h3>F1 2019</h3>
-        <p>F1 2019 Game torrent.</p>
-        <a class="download-btn" href="files/F1-2019.torrent" download>Download</a>
+<div class="torrent-card">
+  <div class="category-icon cat-video">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff4557" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+  </div>
+  <div class="card-meta">
+    <p class="torrent-name">Placeholder</p>
+    <div class="torrent-tags">
+      <span class="tag quality">Placeholder</span>
+      <span class="tag quality">Placeholder</span>
+      <span class="tag">Placeholder</span>
+      <span class="tag">Placeholder</span>
     </div>
+  </div>
+  <a href="#" class="btn-dl" onclick="startDownload(event,'F1 2026 Bahrain Onboards')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    DOWNLOAD
+  </a>
+</div>
 
-    <div class="file-box">
-        <h3>GTA V Enhanced</h3>
-        <p>GTA V Enhanced Game torrent.</p>
-        <a class="download-btn" href="files/GTA-V-Enhanced.torrent" download>Download</a>
+<div class="torrent-card">
+  <div class="category-icon cat-music">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#aa64ff" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  </div>
+  <div class="card-meta">
+    <p class="torrent-name">Placeholder</p>
+    <div class="torrent-tags">
+      <span class="tag quality">Placeholder</span>
+      <span class="tag quality">Placeholder</span>
+      <span class="tag">Placeholder</span>
+      <span class="tag">Placeholder</span>
     </div>
+  </div>
+  <a href="#" class="btn-dl" onclick="startDownload(event,'Ambient Lo-Fi Pack Vol.2')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    DOWNLOAD
+  </a>
+</div>
 
-    <div class="file-box">
-        <h3>BeamNG.Drive</h3>
-        <p>BeamNG.Drive Game torrent.</p>
-        <a class="download-btn" href="files/GTA-V-Enhanced.torrent" download>Download</a>
+<div class="torrent-card">
+  <div class="category-icon cat-soft">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+  </div>
+  <div class="card-meta">
+    <p class="torrent-name">Placeholder</p>
+    <div class="torrent-tags">
+      <span class="tag quality">Placeholder</span>
+      <span class="tag">Placeholder</span>
+      <span class="tag">Placeholder</span>
     </div>
+  </div>
+  <a href="#" class="btn-dl" onclick="startDownload(event,'Arch Linux ISO')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    DOWNLOAD
+  </a>
+</div>
 
-    <div class="file-box">
-        <h3>Assetto Corsa Competizione</h3>
-        <p>Assetto Corsa Competizione Game torrent.</p>
-        <a class="download-btn" href="files/Assetto-Corsa-Competizione.torrent" download>Download</a>
-    </div>
 
-    <div class="file-box">
-        <h3>Golf With Your Friends</h3>
-        <p>Golf With Your Friends Game torrent.</p>
-        <a class="download-btn" href="files/Golf-With-Your-Friends.torrent" download>Download</a>
-    </div>
+  </div>
 
-    <div class="file-box">
-        <h3>Human: Fall Flat</h3>
-        <p>Human: Fall Flat Game torrent.</p>
-        <a class="download-btn" href="files/Human-Fall-Flat.torrent" download>Download</a>
-    </div>
-
-    <div class="file-box">
-        <h3>Call of Duty: Modern Warfare II</h3>
-        <p>Call of Duty: Modern Warfare II Game torrent.</p>
-        <a class="download-btn" href="files/COD-MW2.torrent" download>Download</a>
-    </div>
-
-    <div class="file-box">
-        <h3>A Minecraft Movie (1080P)</h3>
-        <p>A Minecraft Movie Movie torrent.</p>
-        <a class="download-btn" href="files/A-Minecraft-Movie-1080P.torrent" download>Download</a>
-    </div>
-
-    <div class="file-box">
-        <h3>placeholder</h3>
-        <p>placeholder Game torrent.</p>
-        <a class="download-btn" href="files/Assetto-Corsa-Competizione.torrent" download>Download</a>
-    </div>
-
+  <p class="footer">Made by &nbsp;<span>TechSverre</span> &nbsp;·&nbsp; :)</p>
 </main>
 
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  <span id="toastMsg">Initialising download…</span>
+</div>
+
 <script>
-function toggleMenu() {
-    let menu = document.getElementById("sideMenu");
-    menu.style.width = (menu.style.width === "250px") ? "0" : "250px";
-}
+  function toggleMenu() {
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('menuPanel').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function startDownload(e, name) {
+    e.preventDefault();
+    showToast('Downloading — ' + name);
+    // Set href on the <a> tag to your real .torrent file URL
+  }
 </script>
 
 </body>
 </html>
-
-
