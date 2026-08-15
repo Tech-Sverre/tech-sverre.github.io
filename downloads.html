@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>downloads · techsverre</title>
+<style>
+  :root{
+    --deep: #030816;
+    --blue-1: #061638;
+    --blue-2: #0b2a63;
+    --glow: #4d9fff;
+    --glass: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.14);
+    --text: #eaf2ff;
+    --text-dim: rgba(234,242,255,0.62);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    min-height:100%;
+    background:var(--deep);
+    color:var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  body{
+    position:relative;
+    padding:90px 16px 60px;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(77,159,255,0.25), transparent 45%),
+      radial-gradient(circle at 80% 85%, rgba(26,79,160,0.35), transparent 50%),
+      linear-gradient(180deg, var(--deep) 0%, var(--blue-1) 45%, var(--blue-2) 100%);
+    z-index:0;
+  }
+
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index:1;
+    mix-blend-mode: overlay;
+  }
+
+  .back{
+    position:fixed;
+    top:22px;
+    left:22px;
+    z-index:20;
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border:1px solid var(--glass-border);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color: var(--text);
+    text-decoration:none;
+  }
+
+  .back svg{ width:20px; height:20px; }
+
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width:760px;
+    margin:0 auto;
+  }
+
+  h1{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:-0.5px;
+    margin-bottom:6px;
+    text-align:center;
+  }
+
+  p.sub{
+    text-align:center;
+    color: var(--text-dim);
+    font-size:14.5px;
+    margin-bottom:36px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap:20px;
+  }
+
+  .item{
+    background: var(--glass);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    border-radius:22px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---- ITEM IMAGE ----
+     Replace the src below with your own image per item,
+     e.g. "downloads/my-tool.png". Keep the same aspect ratio
+     (16:9) for a consistent grid, or adjust .item-image height. */
+  .item-image{
+    width:100%;
+    height:140px;
+    background: linear-gradient(135deg, #12336b, #061638 70%);
+    background-size:cover;
+    background-position:center;
+  }
+
+  .item-body{
+    padding:18px 20px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    flex:1;
+  }
+
+  .item-name{
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:-0.2px;
+  }
+
+  .download-btn{
+    margin-top:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:11px 16px;
+    border-radius:12px;
+    background: rgba(77,159,255,0.15);
+    border: 1px solid rgba(77,159,255,0.4);
+    color: var(--text);
+    text-decoration:none;
+    font-size:14.5px;
+    font-weight:600;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .download-btn svg{ width:16px; height:16px; }
+
+  .download-btn:hover, .download-btn:focus-visible{
+    background: rgba(77,159,255,0.28);
+    box-shadow: 0 0 18px rgba(77,159,255,0.35);
+    transform: translateY(-2px);
+    outline:none;
+  }
+
+  @media (max-width:480px){
+    body{ padding-top:80px; }
+    h1{ font-size:24px; }
+  }
+</style>
+</head>
+<body>
+
+  <a class="back" href="index.html" aria-label="Back to main">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  </a>
+
+  <div class="wrap">
+    <h1>Downloads</h1>
+    <p class="sub">Files, tools, and resources.</p>
+
+    <div class="grid">
+
+      <!-- Duplicate this .item block for each download -->
+      <div class="item">
+        <div class="item-image"></div>
+        <div class="item-body">
+          <div class="item-name">Item Name</div>
+          <a class="download-btn" href="#" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-image"></div>
+        <div class="item-body">
+          <div class="item-name">Item Name</div>
+          <a class="download-btn" href="#" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="item-image"></div>
+        <div class="item-body">
+          <div class="item-name">Item Name</div>
+          <a class="download-btn" href="#" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><line x1="5" y1="21" x2="19" y2="21"/></svg>
+            Download
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
